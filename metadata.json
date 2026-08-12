@@ -1,0 +1,6 @@
+{
+  "name": "Jin Sangeet - Jain Spiritual Music",
+  "description": "Minimalist single-section Jain spiritual music website with sacred chants and glassmorphism audio player.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
