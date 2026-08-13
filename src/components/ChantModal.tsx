@@ -35,8 +35,8 @@ export const ChantModal: React.FC<ChantModalProps> = ({
   const progressPercent = Math.min(100, Math.round((chantCount / targetBeads) * 100));
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/70 backdrop-blur-xl animate-in fade-in duration-300">
-      <div className="relative w-full max-w-lg overflow-hidden rounded-[32px] bg-[#1a0f0e]/90 backdrop-blur-2xl border border-white/20 shadow-[0_0_50px_rgba(156,74,61,0.4)] p-6 text-white">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-black/70 backdrop-blur-xl animate-in fade-in duration-300 overflow-y-auto">
+      <div className="relative w-full max-w-lg max-h-[94dvh] overflow-y-auto overflow-x-hidden rounded-[26px] sm:rounded-[32px] bg-[#1a0f0e]/90 backdrop-blur-2xl border border-white/20 shadow-[0_0_50px_rgba(156,74,61,.4)] p-4 sm:p-6 text-white">
         {/* Background aura */}
         <div className="absolute -top-24 -left-24 w-48 h-48 bg-orange-500/20 rounded-full blur-3xl pointer-events-none"></div>
         <div className="absolute -bottom-24 -right-24 w-48 h-48 bg-[#9c4a3d]/30 rounded-full blur-3xl pointer-events-none"></div>
@@ -48,7 +48,7 @@ export const ChantModal: React.FC<ChantModalProps> = ({
               <Flame className="w-5 h-5 text-amber-400" />
             </div>
             <div>
-              <h3 className="text-xl font-devanagari font-bold text-amber-100">
+              <h3 className="text-base sm:text-xl font-devanagari font-bold text-amber-100">
                 पवित्र जाप (Sacred Chant)
               </h3>
               <p className="text-xs font-sans text-amber-200/80">
@@ -68,8 +68,8 @@ export const ChantModal: React.FC<ChantModalProps> = ({
         {/* Content Body */}
         <div className="mt-6 flex flex-col items-center text-center">
           {/* Devanagari Verse Card */}
-          <div className="w-full p-4 rounded-2xl bg-amber-950/30 border border-amber-500/20 text-center">
-            <h4 className="text-2xl font-devanagari font-bold text-amber-200 leading-relaxed drop-shadow">
+          <div className="w-full p-3 sm:p-4 rounded-2xl bg-amber-950/30 border border-amber-500/20 text-center">
+            <h4 className="text-xl sm:text-2xl font-devanagari font-bold text-amber-200 leading-relaxed drop-shadow">
               {track.titleDevanagari}
             </h4>
             <div className="mt-3 space-y-1.5 text-sm sm:text-base font-devanagari-subtle text-amber-100/90 leading-relaxed">
@@ -80,10 +80,10 @@ export const ChantModal: React.FC<ChantModalProps> = ({
           </div>
 
           {/* 108 Mala Beads Counter Ring */}
-          <div className="mt-6 flex flex-col items-center">
+          <div className="mt-4 sm:mt-6 flex flex-col items-center">
             <button
               onClick={handleIncrementChant}
-              className="group relative w-36 h-36 rounded-full bg-gradient-to-tr from-amber-950 via-stone-900 to-amber-900 border-2 border-amber-400/40 shadow-[0_0_30px_rgba(245,158,11,0.3)] hover:scale-105 active:scale-95 transition-all duration-300 flex flex-col items-center justify-center cursor-pointer select-none"
+              className="group relative w-32 h-32 sm:w-36 sm:h-36 rounded-full bg-gradient-to-tr from-amber-950 via-stone-900 to-amber-900 border-2 border-amber-400/40 shadow-[0_0_30px_rgba(245,158,11,0.3)] hover:scale-105 active:scale-95 transition-all duration-300 flex flex-col items-center justify-center cursor-pointer select-none"
             >
               {/* Outer Progress Ring SVG */}
               <svg className="absolute inset-0 w-full h-full -rotate-90">
@@ -122,7 +122,7 @@ export const ChantModal: React.FC<ChantModalProps> = ({
           </div>
 
           {/* Quick Actions */}
-          <div className="mt-6 flex items-center justify-center gap-4 w-full">
+          <div className="mt-5 flex flex-col sm:flex-row items-stretch justify-center gap-2.5 sm:gap-4 w-full">
             <button
               onClick={onTogglePlay}
               className={`flex-1 py-2.5 px-4 rounded-xl border font-sans font-medium text-sm flex items-center justify-center gap-2 transition-all ${

@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { X, Music, BookOpen, Info, Bell, Sparkles, Check, Heart } from 'lucide-react';
 import { Track } from '../types';
+import jainMusicCover from '../assets/images/V4.png';
 
 interface MenuDrawerProps {
   isOpen: boolean;
@@ -24,12 +25,12 @@ export const MenuDrawer: React.FC<MenuDrawerProps> = ({
   return (
     <div className="fixed inset-0 z-50 flex justify-start bg-black/70 backdrop-blur-md animate-in fade-in duration-300">
       {/* Side Glass Drawer */}
-      <div className="relative w-full max-w-md h-full bg-[#1a0f0e]/95 backdrop-blur-2xl border-r border-white/15 p-6 text-white flex flex-col justify-between shadow-2xl overflow-y-auto">
+      <div className="relative w-full sm:max-w-md h-full bg-[#1a0f0e]/95 backdrop-blur-2xl border-r border-white/15 px-4 py-4 sm:p-6 text-white flex flex-col justify-between shadow-2xl overflow-y-auto overscroll-contain">
         <div>
           {/* Drawer Header */}
-          <div className="flex items-center justify-between pb-4 border-b border-white/10">
+          <div className="flex items-center justify-between pb-3 sm:pb-4 border-b border-white/10">
             <div className="flex items-center gap-2">
-              <span className="text-2xl font-serif text-white tracking-widest" style={{ fontFamily: 'Georgia, serif' }}>जिन संगीत</span>
+              <span className="text-xl sm:text-2xl font-serif text-white tracking-widest" style={{ fontFamily: 'Georgia, serif' }}>विशेष-संगीत</span>
               <span className="text-xs font-sans px-2.5 py-0.5 rounded-full bg-orange-500/20 text-orange-200 border border-orange-400/30 uppercase tracking-wider">
                 Spiritual
               </span>
@@ -45,22 +46,22 @@ export const MenuDrawer: React.FC<MenuDrawerProps> = ({
           </div>
 
           {/* Navigation Tabs */}
-          <div className="flex items-center gap-2 my-4 p-1 rounded-xl bg-stone-900/80 border border-white/10">
+          <div className="grid grid-cols-3 items-center gap-1 sm:gap-2 my-3 sm:my-4 p-1 rounded-xl bg-stone-900/80 border border-white/10">
             <button
               onClick={() => setActiveTab('tracks')}
-              className={`flex-1 py-2 px-3 rounded-lg text-xs font-sans font-medium flex items-center justify-center gap-1.5 transition-colors ${
+              className={`w-full py-2 px-1 sm:px-3 rounded-lg text-xs font-sans font-medium flex items-center justify-center gap-1.5 transition-colors ${
                 activeTab === 'tracks'
                   ? 'bg-amber-600/50 text-amber-100 font-semibold'
                   : 'text-stone-400 hover:text-stone-200'
               }`}
             >
               <Music className="w-3.5 h-3.5" />
-              <span>Chants</span>
+              <span>Bhajans</span>
             </button>
 
             <button
               onClick={() => setActiveTab('lyrics')}
-              className={`flex-1 py-2 px-3 rounded-lg text-xs font-sans font-medium flex items-center justify-center gap-1.5 transition-colors ${
+              className={`w-full py-2 px-1 sm:px-3 rounded-lg text-xs font-sans font-medium flex items-center justify-center gap-1.5 transition-colors ${
                 activeTab === 'lyrics'
                   ? 'bg-amber-600/50 text-amber-100 font-semibold'
                   : 'text-stone-400 hover:text-stone-200'
@@ -72,7 +73,7 @@ export const MenuDrawer: React.FC<MenuDrawerProps> = ({
 
             <button
               onClick={() => setActiveTab('about')}
-              className={`flex-1 py-2 px-3 rounded-lg text-xs font-sans font-medium flex items-center justify-center gap-1.5 transition-colors ${
+              className={`w-full py-2 px-1 sm:px-3 rounded-lg text-xs font-sans font-medium flex items-center justify-center gap-1.5 transition-colors ${
                 activeTab === 'about'
                   ? 'bg-amber-600/50 text-amber-100 font-semibold'
                   : 'text-stone-400 hover:text-stone-200'
@@ -98,7 +99,7 @@ export const MenuDrawer: React.FC<MenuDrawerProps> = ({
                       onSelectTrack(idx);
                       onClose();
                     }}
-                    className={`w-full p-3 rounded-xl border text-left transition-all flex items-center justify-between group ${
+                    className={`w-full p-2.5 sm:p-3 rounded-xl border text-left transition-all flex items-center justify-between group ${
                       isSelected
                         ? 'bg-amber-950/50 border-amber-500/50 text-amber-100 shadow-md'
                         : 'bg-stone-900/40 hover:bg-stone-900/80 border-white/10 text-stone-300 hover:text-stone-100'
@@ -106,10 +107,10 @@ export const MenuDrawer: React.FC<MenuDrawerProps> = ({
                   >
                     <div className="flex items-center gap-3 min-w-0">
                       <img
-                        src={track.coverUrl}
+                        src={track.coverUrl || jainMusicCover}
                         alt={track.title}
                         referrerPolicy="no-referrer"
-                        className="w-10 h-10 rounded-lg object-cover shrink-0"
+                        className="w-9 h-9 sm:w-10 sm:h-10 rounded-lg object-cover shrink-0"
                       />
                       <div className="truncate">
                         <div className="text-sm font-cinzel font-semibold truncate group-hover:text-amber-200">
@@ -159,17 +160,32 @@ export const MenuDrawer: React.FC<MenuDrawerProps> = ({
               <div className="p-4 rounded-xl bg-stone-900/60 border border-white/10 space-y-3">
                 <div className="flex items-center gap-2 text-amber-200 font-cinzel text-sm font-semibold">
                   <Sparkles className="w-4 h-4 text-amber-400" />
-                  <span>About Jin Sangeet</span>
+                  <span>About Vishesh-Sangeet</span>
                 </div>
                 <p>
-                  Jin Sangeet (जिन संगीत) is a peaceful spiritual music portal inspired by traditional Jain temple architecture, sacred mantras, and meditative resonances.
-                </p>
+                 Vishesh-Sangeet is a peaceful spiritual music portal dedicated to the soulful devotional songs of प.पू. उपाध्याय श्री विशेष सागरजी महाराज जी and his revered Gurudev, प.पू. आचार्य श्री विराग सागरजी महाराज.
+                 </p>
                 <p>
-                  Rooted in the eternal teachings of Jainism (Jinshasan), these chants cultivate Ahimsa (non-violence), Karuna (compassion), and Samyag Darshana (right faith).
+                  Inspired by traditional Jain temple architecture, sacred mantras, and meditative resonances, this platform offers a divine space for inner reflection and spiritual elevation.
                 </p>
               </div>
+              <div className="p-4 rounded-xl bg-stone-900/60 border border-white/10 space-y-3">
+              <p>
+                <strong className="flex items-center gap-2 text-amber-200 font-cinzel text-sm font-semibold">Developed By:</strong> Alfaastack Technologie's Jamner <br /> in collaboration with Miss. Monali Jain - Gurudev's Bhakt Parivar.
+              </p>
+              <p className="pt-2">
+          <a 
+            href="https://alfaastack.site" 
+            target="_blank" 
+            rel="noopener noreferrer" 
+            className="lex items-center gap-2 text-amber-200 font-cinzel text-sm font-semibold"
+          >
+            Visit Us - Alfaastack Technologies
+          </a>
+        </p>
+            </div>
 
-              <div className="p-4 rounded-xl bg-stone-900/60 border border-white/10 space-y-2">
+              {/* <div className="p-4 rounded-xl bg-stone-900/60 border border-white/10 space-y-2">
                 <div className="flex items-center gap-2 text-amber-200 font-cinzel text-sm font-semibold">
                   <Bell className="w-4 h-4 text-amber-400" />
                   <span>Soundscape &amp; Tanpura</span>
@@ -177,7 +193,7 @@ export const MenuDrawer: React.FC<MenuDrawerProps> = ({
                 <p>
                   The Web Audio synth generates real-time harmonic tanpura resonances tuned to C# (136.1 Hz OM frequency) with traditional temple bell chimes.
                 </p>
-              </div>
+              </div> */}
             </div>
           )}
         </div>
@@ -186,7 +202,7 @@ export const MenuDrawer: React.FC<MenuDrawerProps> = ({
         <div className="pt-4 border-t border-white/10 text-center text-[11px] font-sans text-stone-400 flex items-center justify-center gap-1">
           <span>Jai Jinendra</span>
           <Heart className="w-3 h-3 text-rose-400 fill-rose-400 inline" />
-          <span>Jinshasan Devotion</span>
+          <span></span>
         </div>
       </div>
     </div>

@@ -15,7 +15,7 @@ import { Track } from './types';
 
 // Background video
 // import heroVideo from './assets/images/LIVEBG.mp4';
-import heroImg from './assets/images/V3.png';
+import heroImg from './assets/images/V5.png';
 
 export default function App() {
   const [tracks, setTracks] = useState<Track[]>([]);
@@ -115,7 +115,7 @@ useEffect(() => {
         );
 
         setError(
-          'Unable to load songs from Supabase.'
+          'Unable to load songs Check your Internet Connection.'
         );
       } finally {
         setIsLoading(false);
@@ -398,15 +398,15 @@ useEffect(() => {
   if (isLoading) {
     return (
       <main
-        className="w-screen h-screen flex items-center justify-center text-white"
+        className="w-full min-h-[100dvh] flex items-center justify-center px-5 text-white"
         style={{
           backgroundColor:
-            '#4a1c17',
+            '#00ab7515',
         }}
       >
         <div className="text-center">
           <div className="text-3xl font-semibold">
-            Jin Sangeet
+            Vishesh Sangeet
           </div>
 
           <div className="mt-3 text-white/60">
@@ -424,7 +424,7 @@ useEffect(() => {
   if (error) {
     return (
       <main
-        className="w-screen h-screen flex items-center justify-center text-white"
+        className="w-full min-h-[100dvh] flex items-center justify-center px-5 text-white"
         style={{
           backgroundColor:
             '#4a1c17',
@@ -462,7 +462,7 @@ useEffect(() => {
   ) {
     return (
       <main
-        className="w-screen h-screen flex items-center justify-center text-white"
+        className="w-full min-h-[100dvh] flex items-center justify-center px-5 text-white"
         style={{
           backgroundColor:
             '#4a1c17',
@@ -487,7 +487,7 @@ useEffect(() => {
 
   return (
     <main
-      className="relative w-screen h-screen overflow-hidden flex flex-col justify-between text-white font-sans selection:bg-orange-200 select-none"
+      className="relative w-full min-h-[100dvh] h-[100dvh] overflow-hidden flex flex-col text-white font-sans selection:bg-orange-200 select-none"
       style={{
         backgroundColor:
           '#4a1c17',
@@ -550,7 +550,11 @@ useEffect(() => {
           HERO
       ====================================== */}
 
-      <section className="relative z-10 flex-1 flex items-center px-6 sm:px-12 md:px-20 max-w-7xl mx-auto w-full pt-16">
+      {/* <section className="relative z-10 flex-1 flex items-start sm:items-center justify-center px-4 sm:px-12 md:px-20 max-w-7xl mx-auto w-full pt-24 sm:pt-16 pb-44 sm:pb-32">
+        <Hero />
+      </section> */}
+
+      <section className="relative z-10 flex-1 flex items-center justify-center w-full">
         <Hero />
       </section>
 
@@ -573,7 +577,7 @@ useEffect(() => {
           MUSIC PLAYER
       ====================================== */}
 
-      <section className="relative z-20 pb-6 sm:pb-8">
+      <section className="relative z-20 w-full px-0 pb-3 sm:pb-8">
         <MusicPlayer
           track={
             currentTrack
