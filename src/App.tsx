@@ -13,6 +13,13 @@ import { trackOnlineUsers } from './services/onlineUsers';
 
 import { Track } from './types';
 
+// ==========================================
+// INSTALL APP PROMPT
+// ==========================================
+import { InstallApp } from './components/InstallApp';
+// ==========================================
+
+
 // Background video
 // import heroVideo from './assets/images/LIVEBG.mp4';
 import heroImg from './assets/images/V5.png';
@@ -84,6 +91,7 @@ useEffect(() => {
     cleanup?.();
   };
 }, []);
+
 
   // ==========================================
   // LOAD TRACKS FROM SUPABASE
@@ -416,6 +424,7 @@ useEffect(() => {
       </main>
     );
   }
+  
 
   // ==========================================
   // ERROR
@@ -427,7 +436,7 @@ useEffect(() => {
         className="w-full min-h-[100dvh] flex items-center justify-center px-5 text-white"
         style={{
           backgroundColor:
-            '#4a1c17',
+            '#022210',
         }}
       >
         <div className="text-center">
@@ -465,7 +474,7 @@ useEffect(() => {
         className="w-full min-h-[100dvh] flex items-center justify-center px-5 text-white"
         style={{
           backgroundColor:
-            '#4a1c17',
+            '#022210',
         }}
       >
         <div className="text-center">
@@ -490,7 +499,7 @@ useEffect(() => {
       className="relative w-full min-h-[100dvh] h-[100dvh] overflow-hidden flex flex-col text-white font-sans selection:bg-orange-200 select-none"
       style={{
         backgroundColor:
-          '#4a1c17',
+          '#022210',
       }}
     >
 
@@ -544,6 +553,7 @@ useEffect(() => {
         onlineCount={
           onlineCount
         }
+
       />
 
       {/* ======================================
@@ -556,11 +566,14 @@ useEffect(() => {
 
       <section className="relative z-10 flex-1 flex items-center justify-center w-full">
         <Hero />
+      
       </section>
 
       {/* ======================================
           CHANT BUTTON
       ====================================== */}
+      {/* Install App */}
+      <InstallApp />
 
       <ChantButton
         onClick={() =>
