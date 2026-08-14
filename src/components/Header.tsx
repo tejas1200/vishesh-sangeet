@@ -113,7 +113,6 @@ export const Header: React.FC<HeaderProps> = ({
           "
         >
           <Code2 className="w-3.5 h-3.5 sm:w-4 sm:h-4 shrink-0" />
-
           <span className="sm:hidden">Dev</span>
           <span className="hidden sm:inline">Developer</span>
         </a>
