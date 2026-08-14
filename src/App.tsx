@@ -570,11 +570,12 @@ useEffect(() => {
       </section>
 
       {/* ======================================
-          CHANT BUTTON
+          TOP ACTIONS
+          InstallApp = left, Header = center/right
       ====================================== */}
-      {/* Install App */}
       <InstallApp />
 
+      {/* Chant */}
       <ChantButton
         onClick={() =>
           setIsChantModalOpen(
