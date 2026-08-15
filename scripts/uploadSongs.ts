@@ -19,166 +19,461 @@ const supabase = createClient(
 const SONGS_FOLDER = path.join(process.cwd(), 'songs');
 const BUCKET_NAME = 'songs';
 
+
+// ======================================================
+// CLEAN TITLE
+// ======================================================
+
 function createTitle(filename: string): string {
-  let title = filename
+  return filename
     .replace(/\.[^/.]+$/, '')
     .replace(/^\s*\d+\s*[-_.]?\s*/, '')
     .replace(/[_-]+/g, ' ')
     .replace(/\s+/g, ' ')
-    .trim();
-
-  return title
+    .trim()
     .split(' ')
-    .map(word => {
-      if (!word) return word;
-
-      return word.charAt(0).toUpperCase() + word.slice(1);
-    })
+    .filter(Boolean)
+    .map(
+      word =>
+        word.charAt(0).toUpperCase() +
+        word.slice(1)
+    )
     .join(' ');
 }
 
-function getTrackNumber(filename: string): number {
-  const match = filename.match(/^\s*(\d+)/);
 
-  return match ? parseInt(match[1], 10) : 999999;
+// ======================================================
+// REMOVE NUMBER FROM FILENAME
+// ======================================================
+
+function cleanSongName(filename: string): string {
+  return filename
+    .replace(/\.[^/.]+$/, '')
+    .replace(/^\s*\d+\s*[-_.]?\s*/, '')
+    .replace(/[_-]+/g, ' ')
+    .replace(/\s+/g, ' ')
+    .trim()
+    .toLowerCase();
 }
 
+
+// ======================================================
+// SAFE STORAGE FILENAME
+// ======================================================
+
+function createSafeFilename(filename: string): string {
+  return filename
+    .replace(/^\s*\d+\s*[-_.]?\s*/, '')
+    .replace(/\s+/g, '-')
+    .replace(/[^a-zA-Z0-9._-]/g, '')
+    .toLowerCase();
+}
+
+
+// ======================================================
+// CONTENT TYPE
+// ======================================================
+
+function getContentType(extension: string): string {
+  const types: Record<string, string> = {
+    '.mp3': 'audio/mpeg',
+    '.m4a': 'audio/mp4',
+    '.wav': 'audio/wav',
+    '.ogg': 'audio/ogg',
+    '.aac': 'audio/aac',
+  };
+
+  return types[extension] || 'audio/mpeg';
+}
+
+
+// ======================================================
+// MAIN
+// ======================================================
+
 async function uploadSongs() {
-  console.log('\n🎵 Jin Sangeet Bulk Song Uploader');
-  console.log('=================================\n');
+
+  console.log('\n🎵 Jin Sangeet Smart Bulk Uploader');
+  console.log('====================================\n');
+
+
+  // ----------------------------------------------------
+  // CHECK FOLDER
+  // ----------------------------------------------------
 
   if (!fs.existsSync(SONGS_FOLDER)) {
-    console.error(`❌ Songs folder not found: ${SONGS_FOLDER}`);
+    console.error(
+      `❌ Songs folder not found: ${SONGS_FOLDER}`
+    );
+
     process.exit(1);
   }
+
+
+  // ----------------------------------------------------
+  // GET SONG FILES
+  // ----------------------------------------------------
 
   const files = fs
     .readdirSync(SONGS_FOLDER)
-    .filter(file => /\.(mp3|m4a|wav|ogg|aac)$/i.test(file))
-    .sort((a, b) => {
-      return getTrackNumber(a) - getTrackNumber(b);
-    });
+    .filter(file =>
+      /\.(mp3|m4a|wav|ogg|aac)$/i.test(file)
+    )
+    .sort((a, b) =>
+      a.localeCompare(b)
+    );
+
 
   if (files.length === 0) {
-    console.error('❌ No audio files found in songs folder.');
+    console.error(
+      '❌ No audio files found.'
+    );
+
     process.exit(1);
   }
 
-  console.log(`📀 Found ${files.length} audio files.\n`);
+
+  console.log(
+    `📀 Found ${files.length} audio files.\n`
+  );
+
+
+  // ----------------------------------------------------
+  // GET EXISTING DATABASE TRACKS
+  // ----------------------------------------------------
+
+  console.log(
+    '🔍 Reading existing tracks...\n'
+  );
+
+  const {
+    data: existingTracks,
+    error: tracksError,
+  } = await supabase
+    .from('tracks')
+    .select(
+      'id, track_number, title, audio_url'
+    )
+    .order('track_number', {
+      ascending: true,
+    });
+
+
+  if (tracksError) {
+    console.error(
+      '❌ Could not read tracks:',
+      tracksError.message
+    );
+
+    process.exit(1);
+  }
+
+
+  // ----------------------------------------------------
+  // EXISTING TRACK NUMBERS
+  // ----------------------------------------------------
+
+  const usedNumbers = new Set<number>();
+
+  // Existing song names
+  const existingSongNames = new Set<string>();
+
+
+  for (const track of existingTracks || []) {
+
+    usedNumbers.add(
+      track.track_number
+    );
+
+    existingSongNames.add(
+      track.title
+        .replace(/[_-]+/g, ' ')
+        .replace(/\s+/g, ' ')
+        .trim()
+        .toLowerCase()
+    );
+  }
+
+
+  console.log(
+    `📊 Existing tracks: ${usedNumbers.size}`
+  );
+
+
+  // ----------------------------------------------------
+  // FIND NEXT NUMBER
+  // ----------------------------------------------------
+
+  let nextNumber = 1;
+
+  while (
+    usedNumbers.has(nextNumber)
+  ) {
+    nextNumber++;
+  }
+
+
+  console.log(
+    `🔢 New songs will start from: ${nextNumber}\n`
+  );
+
+
+  // ----------------------------------------------------
+  // COUNTERS
+  // ----------------------------------------------------
 
   let uploaded = 0;
   let skipped = 0;
   let failed = 0;
 
-  for (let i = 0; i < files.length; i++) {
-    const filename = files[i];
 
-    const trackNumber = getTrackNumber(filename);
-    const title = createTitle(filename);
+  // ====================================================
+  // PROCESS EACH SONG
+  // ====================================================
+
+  for (
+    let i = 0;
+    i < files.length;
+    i++
+  ) {
+
+    const filename = files[i];
 
     console.log(
       `[${i + 1}/${files.length}] ${filename}`
     );
 
+
     try {
-      // Check if this track already exists
-      const { data: existingTrack, error: checkError } =
-        await supabase
-          .from('tracks')
-          .select('id, title, audio_url')
-          .eq('track_number', trackNumber)
-          .maybeSingle();
 
-      if (checkError) {
-        throw checkError;
-      }
+      // ------------------------------------------------
+      // CREATE TITLE
+      // ------------------------------------------------
 
-      if (existingTrack) {
+      const title =
+        createTitle(filename);
+
+
+      const cleanName =
+        cleanSongName(filename);
+
+
+      // ------------------------------------------------
+      // DUPLICATE CHECK BY SONG NAME
+      // ------------------------------------------------
+
+      if (
+        existingSongNames.has(cleanName)
+      ) {
+
         console.log(
-          `   ⏭️  Already exists: ${existingTrack.title}`
+          `   ⏭️ Already exists: ${title}`
         );
 
         skipped++;
+
         continue;
       }
 
-      const localFilePath = path.join(
-        SONGS_FOLDER,
-        filename
-      );
 
-      const fileBuffer = fs.readFileSync(localFilePath);
+      // ------------------------------------------------
+      // FIND NEXT AVAILABLE NUMBER
+      // ------------------------------------------------
 
-      const safeFilename = filename
-        .replace(/^\s*\d+\s*[-_.]?\s*/, '')
-        .replace(/\s+/g, '-')
-        .replace(/[^a-zA-Z0-9._-]/g, '')
-        .toLowerCase();
+      while (
+        usedNumbers.has(nextNumber)
+      ) {
+        nextNumber++;
+      }
 
-      const storagePath = `${String(trackNumber).padStart(
-        3,
-        '0'
-      )}-${safeFilename}`;
 
-      const extension = path
-        .extname(filename)
-        .toLowerCase();
+      const trackNumber =
+        nextNumber;
 
-      const contentTypes: Record<string, string> = {
-        '.mp3': 'audio/mpeg',
-        '.m4a': 'audio/mp4',
-        '.wav': 'audio/wav',
-        '.ogg': 'audio/ogg',
-        '.aac': 'audio/aac',
-      };
+
+      // ------------------------------------------------
+      // LOCAL FILE
+      // ------------------------------------------------
+
+      const localFilePath =
+        path.join(
+          SONGS_FOLDER,
+          filename
+        );
+
+
+      if (
+        !fs.existsSync(
+          localFilePath
+        )
+      ) {
+
+        throw new Error(
+          'Local file not found'
+        );
+      }
+
+
+      // ------------------------------------------------
+      // READ FILE
+      // ------------------------------------------------
+
+      const fileBuffer =
+        fs.readFileSync(
+          localFilePath
+        );
+
+
+      // ------------------------------------------------
+      // STORAGE FILENAME
+      // ------------------------------------------------
+
+      const safeFilename =
+        createSafeFilename(
+          filename
+        );
+
+
+      const extension =
+        path
+          .extname(filename)
+          .toLowerCase();
+
+
+      const storagePath =
+        `${String(trackNumber).padStart(
+          3,
+          '0'
+        )}-${safeFilename}`;
+
 
       const contentType =
-        contentTypes[extension] || 'audio/mpeg';
+        getContentType(
+          extension
+        );
 
-      console.log('   ⬆️  Uploading audio...');
 
-      const { error: uploadError } =
-        await supabase.storage
-          .from(BUCKET_NAME)
-          .upload(storagePath, fileBuffer, {
+      // ------------------------------------------------
+      // UPLOAD TO SUPABASE STORAGE
+      // ------------------------------------------------
+
+      console.log(
+        `   ⬆️ Uploading as #${trackNumber}...`
+      );
+
+
+      const {
+        error: uploadError,
+      } = await supabase.storage
+        .from(BUCKET_NAME)
+        .upload(
+          storagePath,
+          fileBuffer,
+          {
             contentType,
-            upsert: true,
-          });
+            upsert: false,
+          }
+        );
+
 
       if (uploadError) {
         throw uploadError;
       }
 
+
+      // ------------------------------------------------
+      // GET PUBLIC URL
+      // ------------------------------------------------
+
       const {
         data: publicUrlData,
       } = supabase.storage
         .from(BUCKET_NAME)
-        .getPublicUrl(storagePath);
+        .getPublicUrl(
+          storagePath
+        );
 
-      const audioUrl = publicUrlData.publicUrl;
 
-      console.log('   💾 Creating database record...');
+      const audioUrl =
+        publicUrlData.publicUrl;
 
-      const { error: insertError } = await supabase
+
+      // ------------------------------------------------
+      // CREATE DATABASE RECORD
+      // ------------------------------------------------
+
+      console.log(
+        '   💾 Creating database record...'
+      );
+
+
+      const {
+        error: insertError,
+      } = await supabase
         .from('tracks')
         .insert({
-          track_number: trackNumber,
-          title,
-          audio_url: audioUrl,
-          duration: 0,
-          is_active: true,
-          play_count: 0,
+          track_number:
+            trackNumber,
+
+          title:
+            title,
+
+          audio_url:
+            audioUrl,
+
+          duration:
+            0,
+
+          is_active:
+            true,
+
+          play_count:
+            0,
         });
 
+
+      // ------------------------------------------------
+      // IF DB INSERT FAILS
+      // ------------------------------------------------
+
       if (insertError) {
+
+        // Remove uploaded MP3
+        await supabase.storage
+          .from(BUCKET_NAME)
+          .remove([
+            storagePath
+          ]);
+
         throw insertError;
       }
 
+
+      // ------------------------------------------------
+      // SUCCESS
+      // ------------------------------------------------
+
+      usedNumbers.add(
+        trackNumber
+      );
+
+      existingSongNames.add(
+        cleanName
+      );
+
       uploaded++;
 
-      console.log(`   ✅ ${title}`);
+      nextNumber++;
+
+
+      console.log(
+        `   ✅ #${trackNumber} ${title}`
+      );
+
       console.log('');
+
     } catch (error: any) {
+
       failed++;
 
       console.error(
@@ -193,16 +488,47 @@ async function uploadSongs() {
     }
   }
 
-  console.log('\n=================================');
-  console.log('🎵 Upload Complete');
-  console.log('=================================\n');
 
-  console.log(`Total files : ${files.length}`);
-  console.log(`Uploaded    : ${uploaded}`);
-  console.log(`Skipped     : ${skipped}`);
-  console.log(`Failed      : ${failed}`);
+  // ====================================================
+  // FINAL REPORT
+  // ====================================================
 
-  console.log('\n✨ Jin Sangeet import finished.\n');
+  console.log(
+    '\n===================================='
+  );
+
+  console.log(
+    '🎵 Upload Complete'
+  );
+
+  console.log(
+    '====================================\n'
+  );
+
+  console.log(
+    `Total files : ${files.length}`
+  );
+
+  console.log(
+    `Uploaded    : ${uploaded}`
+  );
+
+  console.log(
+    `Skipped     : ${skipped}`
+  );
+
+  console.log(
+    `Failed      : ${failed}`
+  );
+
+  console.log(
+    '\n✨ Jin Sangeet import finished.\n'
+  );
 }
+
+
+// ======================================================
+// START
+// ======================================================
 
 uploadSongs();

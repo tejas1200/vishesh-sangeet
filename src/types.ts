@@ -1,6 +1,8 @@
 export interface Track {
   id: string;
 
+  track_number: number;
+
   title: string;
 
   titleDevanagari: string;
@@ -28,6 +30,7 @@ export interface Track {
   meaning?: string;
 }
 
+
 export interface PlayerState {
   currentTrackIndex: number;
 
@@ -49,6 +52,7 @@ export interface PlayerState {
 
   templeBellVolume: number;
 }
+
 
 export interface ChantCounterState {
   count: number;
